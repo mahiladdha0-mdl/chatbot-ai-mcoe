@@ -8,6 +8,7 @@ import {
   FAQItem,
   KnowledgeItem,
   CourseType,
+  TeachingAllocation,
 } from '../../types';
 import { Modal } from '../common/Modal';
 import {
@@ -45,6 +46,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   // Local state mirrored from storageService
   const [subjects, setSubjects] = useState<AcademicSubject[]>(() => storageService.getSubjects());
   const [faculty, setFaculty] = useState<FacultyMember[]>(() => storageService.getFaculty());
+  const [allocations, setAllocations] = useState<TeachingAllocation[]>(() => storageService.getAllocations());
   const [queries, setQueries] = useState<StudentQueryRecord[]>(() => storageService.getQueries());
   const [faqs, setFaqs] = useState<FAQItem[]>(() => storageService.getFAQs());
   const [knowledge, setKnowledge] = useState<KnowledgeItem[]>(() => storageService.getKnowledge());
@@ -232,12 +234,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   // RESET TO DEFAULT
   const handleResetToOfficialData = () => {
-    if (window.confirm('Reset all academic subjects and faculty records back to original official AIDS curriculum data?')) {
+    if (window.confirm('Reset all academic subjects, faculty records, and teaching allocations back to original official AIDS curriculum data?')) {
       const defSubjects = storageService.resetSubjects();
       const defFaculty = storageService.resetFaculty();
+      const defAllocations = storageService.resetAllocations();
       setSubjects(defSubjects);
       setFaculty(defFaculty);
-      showToast('All records restored to official curriculum defaults.');
+      setAllocations(defAllocations);
+      showToast('All records and teaching allocations restored to official defaults.');
     }
   };
 
@@ -293,6 +297,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           {[
             { id: 'overview', label: 'Dashboard Overview', icon: LayoutDashboard },
             { id: 'queries', label: 'Student Queries', icon: MessageSquare, count: queries.length },
+            { id: 'allocations', label: 'Faculty Teaching Allocations', icon: Users, count: allocations.length },
             { id: 'faculty_mgmt', label: 'Faculty Directory Management', icon: Users, count: faculty.length },
             { id: 'subjects_mgmt', label: 'Academic Subjects', icon: BookOpen, count: subjects.length },
             { id: 'sem3', label: 'Semester III', icon: Layers },
@@ -572,6 +577,86 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                         </td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: FACULTY TEACHING ALLOCATIONS */}
+        {activeTab === 'allocations' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Faculty–Subject–Division Teaching Allocations
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Subject-wise teaching allocation for Division A and Division B (theory lectures, practical laboratories, and batch assignments).
+                </p>
+              </div>
+
+              <div className="text-xs text-slate-500">
+                {allocations.length} Active Teaching Allocations
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
+                    <tr>
+                      <th className="p-3.5">Subject / Course</th>
+                      <th className="p-3.5">Code</th>
+                      <th className="p-3.5">Type</th>
+                      <th className="p-3.5">Division / Batch</th>
+                      <th className="p-3.5">Assigned Faculty</th>
+                      <th className="p-3.5">Official Email</th>
+                      <th className="p-3.5">Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {allocations
+                      .filter(
+                        a =>
+                          a.subjectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          a.facultyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          a.subjectCode.toLowerCase().includes(searchTerm.toLowerCase())
+                      )
+                      .map(alloc => (
+                        <tr key={alloc.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                          <td className="p-3.5 font-bold text-slate-900 dark:text-white">
+                            {alloc.subjectName}
+                          </td>
+                          <td className="p-3.5 font-mono text-[11px] text-blue-600 dark:text-blue-400">
+                            {alloc.subjectCode}
+                          </td>
+                          <td className="p-3.5">
+                            <span
+                              className={`text-[10px] font-semibold px-2 py-0.5 rounded capitalize ${
+                                alloc.type === 'practical'
+                                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                                  : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                              }`}
+                            >
+                              {alloc.type}
+                            </span>
+                          </td>
+                          <td className="p-3.5 font-medium text-slate-700 dark:text-slate-300">
+                            {alloc.batch ? `Batch ${alloc.batch}` : `Division ${alloc.division}`}
+                          </td>
+                          <td className="p-3.5 font-semibold text-slate-900 dark:text-white">
+                            {alloc.facultyName}
+                          </td>
+                          <td className="p-3.5 font-mono text-[11px] text-slate-500">
+                            {alloc.facultyEmail || '-'}
+                          </td>
+                          <td className="p-3.5 text-slate-500 max-w-xs truncate">
+                            {alloc.notes || '-'}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>

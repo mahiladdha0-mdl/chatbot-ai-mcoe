@@ -29,6 +29,7 @@ export const FacultyDirectoryPage: React.FC<FacultyDirectoryPageProps> = ({
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
 
   const facultyList = storageService.getFaculty();
+  const allocationsList = storageService.getAllocations();
 
   const handleCopy = (email: string) => {
     navigator.clipboard.writeText(email);
@@ -124,6 +125,7 @@ export const FacultyDirectoryPage: React.FC<FacultyDirectoryPageProps> = ({
         <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
           {[
             { id: 'all', label: `All Faculty (${facultyList.length})` },
+            { id: 'allocations', label: 'Subject Teaching Allocations (Div A & B)' },
             { id: 'hod', label: 'Head of Department' },
             { id: 'assistant', label: 'Assistant Professors' },
             { id: 'industry', label: 'Industry Experience' },
@@ -155,13 +157,106 @@ export const FacultyDirectoryPage: React.FC<FacultyDirectoryPageProps> = ({
         </div>
       </div>
 
-      {/* Faculty Cards Grid */}
-      <div className="space-y-4">
-        <div className="text-xs text-slate-500 dark:text-slate-400">
-          Showing {filteredFaculty.length} official faculty record{filteredFaculty.length !== 1 ? 's' : ''}
-        </div>
+      {/* Faculty Cards Grid or Subject Allocations */}
+      {filterType === 'allocations' ? (
+        <div className="space-y-4 animate-in fade-in duration-200">
+          <div className="p-4 rounded-xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200/60 dark:border-blue-900/60 text-xs text-blue-900 dark:text-blue-200 space-y-1">
+            <span className="font-bold block">
+              Semester III Faculty–Subject–Division Teaching Allocation
+            </span>
+            <p className="leading-relaxed">
+              Official faculty allocation across Divisions A &amp; B, theory lectures, laboratory practicals, and batch rotations.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th className="p-3.5">Subject / Course</th>
+                    <th className="p-3.5">Type</th>
+                    <th className="p-3.5">Division / Batch</th>
+                    <th className="p-3.5">Assigned Faculty</th>
+                    <th className="p-3.5">Official Email</th>
+                    <th className="p-3.5 text-right">Ask AI</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {allocationsList
+                    .filter(a =>
+                      a.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      a.facultyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      a.subjectCode.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map(alloc => (
+                      <tr key={alloc.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50">
+                        <td className="p-3.5">
+                          <div className="font-semibold text-slate-900 dark:text-white">
+                            {alloc.subjectName}
+                          </div>
+                          <div className="font-mono text-[10px] text-blue-600 dark:text-blue-400">
+                            {alloc.subjectCode}
+                          </div>
+                        </td>
+                        <td className="p-3.5">
+                          <span
+                            className={`text-[10px] font-semibold px-2 py-0.5 rounded capitalize ${
+                              alloc.type === 'practical'
+                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                                : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                            }`}
+                          >
+                            {alloc.type}
+                          </span>
+                        </td>
+                        <td className="p-3.5 font-medium text-slate-700 dark:text-slate-300">
+                          {alloc.batch ? `Batch ${alloc.batch}` : `Division ${alloc.division}`}
+                        </td>
+                        <td className="p-3.5 font-semibold text-slate-900 dark:text-white">
+                          {alloc.facultyName}
+                        </td>
+                        <td className="p-3.5 font-mono text-[11px] text-slate-500">
+                          {alloc.facultyEmail ? (
+                            <a
+                              href={`mailto:${alloc.facultyEmail}`}
+                              className="text-blue-600 dark:text-blue-400 hover:underline"
+                            >
+                              {alloc.facultyEmail}
+                            </a>
+                          ) : (
+                            '-'
+                          )}
+                        </td>
+                        <td className="p-3.5 text-right whitespace-nowrap">
+                          <button
+                            onClick={() =>
+                              onAskAboutFaculty(
+                                `Who teaches ${alloc.subjectName}${
+                                  alloc.division !== 'Both' ? ` to ${alloc.division} division` : ''
+                                }?`
+                              )
+                            }
+                            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 ml-auto"
+                          >
+                            <Sparkles className="w-3 h-3" />
+                            <span>Ask</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            Showing {filteredFaculty.length} official faculty record{filteredFaculty.length !== 1 ? 's' : ''}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredFaculty.map(fac => {
             const isHod = fac.isHod;
 
@@ -267,6 +362,7 @@ export const FacultyDirectoryPage: React.FC<FacultyDirectoryPageProps> = ({
           })}
         </div>
       </div>
+      )}
     </div>
   );
 };

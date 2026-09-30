@@ -6,14 +6,17 @@ import {
   KnowledgeItem,
   Conversation,
   User,
+  TeachingAllocation,
 } from '../types';
 import { INITIAL_ACADEMIC_SUBJECTS } from '../data/academicData';
 import { INITIAL_FACULTY_DATA } from '../data/facultyData';
 import { INITIAL_FAQS, INITIAL_KNOWLEDGE_BASE } from '../data/faqData';
+import { INITIAL_TEACHING_ALLOCATIONS } from '../data/teachingAllocationData';
 
 const KEYS = {
   SUBJECTS: 'mc_aids_subjects_v1',
   FACULTY: 'mc_aids_faculty_v1',
+  ALLOCATIONS: 'mc_aids_allocations_v1',
   FAQS: 'mc_aids_faqs_v1',
   KNOWLEDGE: 'mc_aids_kb_v1',
   QUERIES: 'mc_aids_queries_v1',
@@ -134,6 +137,27 @@ export const storageService = {
   resetFaculty(): FacultyMember[] {
     localStorage.setItem(KEYS.FACULTY, JSON.stringify(INITIAL_FACULTY_DATA));
     return INITIAL_FACULTY_DATA;
+  },
+
+  // Teaching Allocations
+  getAllocations(): TeachingAllocation[] {
+    try {
+      const stored = localStorage.getItem(KEYS.ALLOCATIONS);
+      if (!stored) {
+        localStorage.setItem(KEYS.ALLOCATIONS, JSON.stringify(INITIAL_TEACHING_ALLOCATIONS));
+        return INITIAL_TEACHING_ALLOCATIONS;
+      }
+      return JSON.parse(stored);
+    } catch {
+      return INITIAL_TEACHING_ALLOCATIONS;
+    }
+  },
+  saveAllocations(allocations: TeachingAllocation[]): void {
+    localStorage.setItem(KEYS.ALLOCATIONS, JSON.stringify(allocations));
+  },
+  resetAllocations(): TeachingAllocation[] {
+    localStorage.setItem(KEYS.ALLOCATIONS, JSON.stringify(INITIAL_TEACHING_ALLOCATIONS));
+    return INITIAL_TEACHING_ALLOCATIONS;
   },
 
   // FAQs

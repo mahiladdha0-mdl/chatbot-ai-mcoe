@@ -490,11 +490,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 Quick:
               </span>
               {[
-                'What subjects do I have in Semester III?',
-                'What subjects do I have in Semester IV?',
+                'Who teaches OOP to A division?',
+                'Who teaches Operating System?',
+                'Who teaches DSA?',
+                'Who takes practicals?',
                 'Who is the HOD of AIDS?',
-                'Give me Jagruti Patil\'s email',
-                'What is OOP?',
+                'What subjects do I have in Semester III?',
               ].map((q, idx) => (
                 <button
                   key={idx}

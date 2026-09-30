@@ -93,3 +93,17 @@ export interface KnowledgeItem {
   verified: boolean;
   updatedAt: string;
 }
+
+export interface TeachingAllocation {
+  id: string;
+  subjectCode: string;
+  subjectName: string;
+  subjectAliases: string[];
+  type: 'theory' | 'practical' | 'both';
+  division: 'A' | 'B' | 'Both';
+  batch?: string;
+  facultyName: string;
+  facultyEmail?: string;
+  notes?: string;
+}
+

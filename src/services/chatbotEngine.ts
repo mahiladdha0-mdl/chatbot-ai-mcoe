@@ -82,6 +82,346 @@ export function processUserQuery(
     };
   }
 
+  // 3.5. FACULTY–SUBJECT–DIVISION TEACHING ALLOCATION
+  // Helper to find specific faculty member card
+  const findFaculty = (nameMatch: string): FacultyMember | undefined => {
+    const clean = nameMatch.toLowerCase();
+    return allFaculty.find(f => f.name.toLowerCase().includes(clean));
+  };
+
+  const isTeacherQuery =
+    /who (teaches|takes|conducts|handles|is teaching|is the teacher for)|who is (my|the|our) .* (teacher|faculty|professor)|(teacher|faculty|professor) for|who takes/i.test(lower) ||
+    /who (teaches|takes)/i.test(lower);
+
+  const isDivA = /\b(a division|division a|div a|to a division|for a division|in a division)\b/i.test(lower);
+  const isDivB = /\b(b division|division b|div b|to b division|for b division|in b division)\b/i.test(lower);
+  const isPractical = /\b(practical|practicals|lab|laboratory|practicle)\b/i.test(lower);
+
+  // A. Operating System (OS)
+  const isOs = /\b(os|operating system|operating systems)\b/i.test(lower);
+  if (isOs && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    if (isPractical) {
+      const facSurana = findFaculty('Surana') || findFaculty('Lekha');
+      if (isDivA) {
+        return {
+          text: "Operating System practical for A Division is conducted by Ms. Lekha Ishwarwal Surana.",
+          facultyCards: facSurana ? [facSurana] : undefined,
+          suggestedFollowUps: ['Who teaches Operating System?', 'Who teaches DSA practical?', 'Who is the HOD of AIDS?'],
+          intent: 'teaching_allocation_os_lab_a',
+          contextUpdates: { lastSubjectId: 'sem3-os-lab', lastFacultyId: facSurana?.id },
+        };
+      }
+      if (isDivB) {
+        return {
+          text: "Operating System practical for B Division is conducted by Ms. Lekha Ishwarwal Surana.",
+          facultyCards: facSurana ? [facSurana] : undefined,
+          suggestedFollowUps: ['Who teaches Operating System?', 'Who teaches DSA practical?', 'Who is the HOD of AIDS?'],
+          intent: 'teaching_allocation_os_lab_b',
+          contextUpdates: { lastSubjectId: 'sem3-os-lab', lastFacultyId: facSurana?.id },
+        };
+      }
+      return {
+        text: "Operating System practical is handled by Ms. Lekha Ishwarwal Surana for both A and B divisions.",
+        facultyCards: facSurana ? [facSurana] : undefined,
+        suggestedFollowUps: ['Who teaches Operating System?', 'Who teaches OS to A division?', 'Who teaches DSA practical?'],
+        intent: 'teaching_allocation_os_lab',
+        contextUpdates: { lastSubjectId: 'sem3-os-lab', lastFacultyId: facSurana?.id },
+      };
+    }
+
+    // OS Theory
+    const facAlice = findFaculty('Alice') || findFaculty('Marshal');
+    if (isDivA) {
+      return {
+        text: "Operating System for A Division is taught by Ms. Alice Mary Marshal Rajan.",
+        facultyCards: facAlice ? [facAlice] : undefined,
+        suggestedFollowUps: ['Who teaches OS to B division?', 'Who teaches OS practical?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_os_a',
+        contextUpdates: { lastSubjectId: 'sem3-os', lastFacultyId: facAlice?.id },
+      };
+    }
+    if (isDivB) {
+      return {
+        text: "Operating System for B Division is taught by Ms. Alice Mary Marshal Rajan.",
+        facultyCards: facAlice ? [facAlice] : undefined,
+        suggestedFollowUps: ['Who teaches OS to A division?', 'Who teaches OS practical?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_os_b',
+        contextUpdates: { lastSubjectId: 'sem3-os', lastFacultyId: facAlice?.id },
+      };
+    }
+    return {
+      text: "Operating System is taught by Ms. Alice Mary Marshal Rajan for both A and B divisions.",
+      facultyCards: facAlice ? [facAlice] : undefined,
+      suggestedFollowUps: ['Who teaches OS to A division?', 'Who teaches OS practical?', 'Who teaches OOP?'],
+      intent: 'teaching_allocation_os',
+      contextUpdates: { lastSubjectId: 'sem3-os', lastFacultyId: facAlice?.id },
+    };
+  }
+
+  // B. Object Oriented Programming (OOP)
+  const isOop = /\b(oop|oops|object oriented programming)\b/i.test(lower);
+  if (isOop && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    const facBendale = findFaculty('Bendale') || findFaculty('Bhagyashree');
+    if (isPractical) {
+      return {
+        text: "Object Oriented Programming (OOP) practical is handled by Ms. Bhagyashree P. Bendale for both A and B divisions.",
+        facultyCards: facBendale ? [facBendale] : undefined,
+        suggestedFollowUps: ['Who teaches OOP?', 'Who teaches OS practical?', 'Who teaches DSA practical?'],
+        intent: 'teaching_allocation_oop_lab',
+        contextUpdates: { lastSubjectId: 'sem3-oop-lab', lastFacultyId: facBendale?.id },
+      };
+    }
+
+    if (isDivA) {
+      return {
+        text: "OOP for A Division is taught by Ms. Bhagyashree P. Bendale.",
+        facultyCards: facBendale ? [facBendale] : undefined,
+        suggestedFollowUps: ['Who is my OOP teacher in B division?', 'Who teaches Operating System?', 'Who teaches DSA?'],
+        intent: 'teaching_allocation_oop_a',
+        contextUpdates: { lastSubjectId: 'sem3-oop', lastFacultyId: facBendale?.id },
+      };
+    }
+    if (isDivB) {
+      return {
+        text: "OOP for B Division is taught by Ms. Bhagyashree P. Bendale.",
+        facultyCards: facBendale ? [facBendale] : undefined,
+        suggestedFollowUps: ['Who teaches OOP to A division?', 'Who teaches Operating System?', 'Who teaches DSA?'],
+        intent: 'teaching_allocation_oop_b',
+        contextUpdates: { lastSubjectId: 'sem3-oop', lastFacultyId: facBendale?.id },
+      };
+    }
+    return {
+      text: "Object Oriented Programming (OOP) is taught by Ms. Bhagyashree P. Bendale for both A and B divisions.",
+      facultyCards: facBendale ? [facBendale] : undefined,
+      suggestedFollowUps: ['Who teaches OOP to A division?', 'Who teaches Operating System?', 'Who teaches DSA?'],
+      intent: 'teaching_allocation_oop',
+      contextUpdates: { lastSubjectId: 'sem3-oop', lastFacultyId: facBendale?.id },
+    };
+  }
+
+  // C. Data Structures and Algorithms (DSA)
+  const isDsa = /\b(dsa|data structures|data structure and algorithms|data structures & algorithms)\b/i.test(lower);
+  if (isDsa && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    if (isPractical) {
+      const facRamtekkar = findFaculty('Ramtekkar') || findFaculty('Preeti');
+      return {
+        text: "Data Structures & Algorithms (DSA) practical is handled by Ms. Preeti Shankar Ramtekkar for both A and B divisions.",
+        facultyCards: facRamtekkar ? [facRamtekkar] : undefined,
+        suggestedFollowUps: ['Who teaches DSA?', 'Who teaches OS practical?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_dsa_lab',
+        contextUpdates: { lastSubjectId: 'sem3-dsa-lab', lastFacultyId: facRamtekkar?.id },
+      };
+    }
+
+    if (isDivA) {
+      const facRamtekkar = findFaculty('Ramtekkar') || findFaculty('Preeti');
+      return {
+        text: "DSA for A Division is taught by Ms. Preeti Shankar Ramtekkar.",
+        facultyCards: facRamtekkar ? [facRamtekkar] : undefined,
+        suggestedFollowUps: ['Who teaches DSA to B division?', 'Who teaches DSA practical?', 'Who teaches Operating System?'],
+        intent: 'teaching_allocation_dsa_a',
+        contextUpdates: { lastSubjectId: 'sem3-dsa', lastFacultyId: facRamtekkar?.id },
+      };
+    }
+    if (isDivB) {
+      const facMalkhede = findFaculty('Malkhede') || findFaculty('Priti');
+      return {
+        text: "DSA for B Division is taught by Prof. Mrs. Priti Malkhede.",
+        facultyCards: facMalkhede ? [facMalkhede] : undefined,
+        suggestedFollowUps: ['Who teaches DSA to A division?', 'Who teaches DSA practical?', 'Who teaches Operating System?'],
+        intent: 'teaching_allocation_dsa_b',
+        contextUpdates: { lastSubjectId: 'sem3-dsa', lastFacultyId: facMalkhede?.id },
+      };
+    }
+
+    const facRamtekkar = findFaculty('Ramtekkar') || findFaculty('Preeti');
+    const facMalkhede = findFaculty('Malkhede') || findFaculty('Priti');
+    const cards = [facRamtekkar, facMalkhede].filter(Boolean) as FacultyMember[];
+    return {
+      text: "For DSA, A Division is taught by Ms. Preeti Shankar Ramtekkar, while B Division is taught by Prof. Mrs. Priti Malkhede.",
+      facultyCards: cards.length > 0 ? cards : undefined,
+      suggestedFollowUps: ['Who takes DSA for A division?', 'Who teaches DSA to B division?', 'Who teaches DSA practical?'],
+      intent: 'teaching_allocation_dsa',
+      contextUpdates: { lastSubjectId: 'sem3-dsa' },
+    };
+  }
+
+  // D. General Practical Sessions (Pure practicals query without a specific subject)
+  const isGeneralPractical =
+    (isPractical && !isOs && !isOop && !isDsa && !/deld|uhv|cep/i.test(lower)) &&
+    (isTeacherQuery || /practical|who/i.test(lower));
+  if (isGeneralPractical) {
+    const facRamtekkar = findFaculty('Ramtekkar') || findFaculty('Preeti');
+    if (isDivA) {
+      return {
+        text: "Ms. Preeti Shankar Ramtekkar handles the practical sessions for A Division.",
+        facultyCards: facRamtekkar ? [facRamtekkar] : undefined,
+        suggestedFollowUps: ['Who takes practical for B division?', 'Who teaches OS practical?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_practical_a',
+      };
+    }
+    if (isDivB) {
+      return {
+        text: "Ms. Preeti Shankar Ramtekkar handles the practical sessions for B Division.",
+        facultyCards: facRamtekkar ? [facRamtekkar] : undefined,
+        suggestedFollowUps: ['Who takes practical for A division?', 'Who teaches OS practical?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_practical_b',
+      };
+    }
+    return {
+      text: "Ms. Preeti Shankar Ramtekkar handles the practical sessions for both A and B divisions.",
+      facultyCards: facRamtekkar ? [facRamtekkar] : undefined,
+      suggestedFollowUps: ['Who takes practical for A division?', 'Who takes practical for B division?', 'Who teaches OS practical?'],
+      intent: 'teaching_allocation_practical_general',
+    };
+  }
+
+  // E. Digital Electronics & Logic Design (DELD)
+  const isDeld = /\b(deld|digital electronics|logic design)\b/i.test(lower);
+  if (isDeld && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    const facGiri = findFaculty('Giri') || findFaculty('Madhuri');
+    if (isPractical) {
+      return {
+        text: "Digital Electronics & Logic Design (DELD) practical sessions are conducted by Mrs. Madhuri Ash Giri for both A and B divisions.",
+        facultyCards: facGiri ? [facGiri] : undefined,
+        suggestedFollowUps: ['Who is my DELD teacher?', 'Who teaches Operating System?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_deld_lab',
+        contextUpdates: { lastSubjectId: 'sem3-deld-lab', lastFacultyId: facGiri?.id },
+      };
+    }
+    if (isDivA) {
+      return {
+        text: "DELD for A Division is taught by Mrs. Madhuri Ash Giri.",
+        facultyCards: facGiri ? [facGiri] : undefined,
+        suggestedFollowUps: ['Who teaches DELD for B division?', 'Who teaches Operating System?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_deld_a',
+        contextUpdates: { lastSubjectId: 'sem3-deld', lastFacultyId: facGiri?.id },
+      };
+    }
+    if (isDivB) {
+      return {
+        text: "DELD for B Division is taught by Mrs. Madhuri Ash Giri.",
+        facultyCards: facGiri ? [facGiri] : undefined,
+        suggestedFollowUps: ['Who teaches DELD for A division?', 'Who teaches Operating System?', 'Who teaches OOP?'],
+        intent: 'teaching_allocation_deld_b',
+        contextUpdates: { lastSubjectId: 'sem3-deld', lastFacultyId: facGiri?.id },
+      };
+    }
+    return {
+      text: "Digital Electronics & Logic Design (DELD) is taught by Mrs. Madhuri Ash Giri for both A and B divisions.",
+      facultyCards: facGiri ? [facGiri] : undefined,
+      suggestedFollowUps: ['Who teaches DELD practical?', 'Who teaches Operating System?', 'Who teaches OOP?'],
+      intent: 'teaching_allocation_deld',
+      contextUpdates: { lastSubjectId: 'sem3-deld', lastFacultyId: facGiri?.id },
+    };
+  }
+
+  // F. Universal Human Values (UHV)
+  const isUhv = /\b(uhv|universal human values|human values)\b/i.test(lower);
+  if (isUhv && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    const facShaiva = findFaculty('Shaiva') || findFaculty('Rucha');
+    if (isDivB) {
+      return {
+        text: "Universal Human Values (UHV) for B Division is taught by Mrs. Rucha Shaiva.",
+        facultyCards: facShaiva ? [facShaiva] : undefined,
+        suggestedFollowUps: ['Who teaches UHV for A division?', 'Who takes CEP for S3 and S4 batch?', 'Who is the HOD of AIDS?'],
+        intent: 'teaching_allocation_uhv_b',
+        contextUpdates: { lastSubjectId: 'sem3-uhv', lastFacultyId: facShaiva?.id },
+      };
+    }
+    if (isDivA) {
+      return {
+        text: "Universal Human Values (UHV) for A Division is taught by Mrs. Rucha Shaiva.",
+        facultyCards: facShaiva ? [facShaiva] : undefined,
+        suggestedFollowUps: ['Who teaches UHV for B division?', 'Who takes CEP for S3 and S4 batch?', 'Who is the HOD of AIDS?'],
+        intent: 'teaching_allocation_uhv_a',
+        contextUpdates: { lastSubjectId: 'sem3-uhv', lastFacultyId: facShaiva?.id },
+      };
+    }
+    return {
+      text: "Universal Human Values (UHV) is taught by Mrs. Rucha Shaiva for both A and B divisions.",
+      facultyCards: facShaiva ? [facShaiva] : undefined,
+      suggestedFollowUps: ['Who teaches UHV for B division?', 'Who takes CEP for S3 and S4 batch?', 'Who is the HOD of AIDS?'],
+      intent: 'teaching_allocation_uhv',
+      contextUpdates: { lastSubjectId: 'sem3-uhv', lastFacultyId: facShaiva?.id },
+    };
+  }
+
+  // G. Sustainability Awareness (CEP)
+  const isCep = /\b(cep|sustainability|sustainability awareness)\b/i.test(lower);
+  if (isCep && (isTeacherQuery || /batch|who/i.test(lower))) {
+    const isS3S4 = /\b(s3 and s4|s3 & s4|s3, s4|s3|s4)\b/i.test(lower);
+    const isS1S2 = /\b(s1 and s2|s1 & s2|s1, s2|s1|s2)\b/i.test(lower);
+
+    if (isS3S4) {
+      const facPatil = findFaculty('Patil') || findFaculty('Jagruti');
+      return {
+        text: "Sustainability Awareness (CEP) for S3 and S4 batch is conducted by Ms. Jagruti Patil (with Prof. Mrs. Supriya Balote conducting S1 and S2 batches).",
+        facultyCards: facPatil ? [facPatil] : undefined,
+        suggestedFollowUps: ['Who takes CEP for S1 and S2 batch?', 'Who teaches UHV for B division?', 'Who is my DELD teacher?'],
+        intent: 'teaching_allocation_cep_s3s4',
+        contextUpdates: { lastSubjectId: 'sem3-sa', lastFacultyId: facPatil?.id },
+      };
+    }
+    if (isS1S2) {
+      const facBalote = findFaculty('Balote') || findFaculty('Supriya');
+      return {
+        text: "Sustainability Awareness (CEP) for S1 and S2 batch is conducted by Prof. Mrs. Supriya Balote (with Ms. Jagruti Patil conducting S3 and S4 batches).",
+        facultyCards: facBalote ? [facBalote] : undefined,
+        suggestedFollowUps: ['Who takes CEP for S3 and S4 batch?', 'Who teaches UHV for B division?', 'Who is my DELD teacher?'],
+        intent: 'teaching_allocation_cep_s1s2',
+        contextUpdates: { lastSubjectId: 'sem3-sa', lastFacultyId: facBalote?.id },
+      };
+    }
+
+    const facBalote = findFaculty('Balote') || findFaculty('Supriya');
+    const facPatil = findFaculty('Patil') || findFaculty('Jagruti');
+    const cards = [facBalote, facPatil].filter(Boolean) as FacultyMember[];
+    return {
+      text: "Sustainability Awareness (CEP) is conducted by Prof. Mrs. Supriya Balote (for S1 & S2 batches) and Ms. Jagruti Patil (for S3 & S4 batches).",
+      facultyCards: cards.length > 0 ? cards : undefined,
+      suggestedFollowUps: ['Who takes CEP for S3 and S4 batch?', 'Who teaches UHV for B division?', 'Who is my DELD teacher?'],
+      intent: 'teaching_allocation_cep',
+      contextUpdates: { lastSubjectId: 'sem3-sa' },
+    };
+  }
+
+  // H. Economics for Engineers (EFE)
+  const isEfe = /\b(economics|economics for engineers|efe)\b/i.test(lower);
+  if (isEfe && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    const facDeshpande = findFaculty('Deshpande') || findFaculty('Priyanka');
+    return {
+      text: "Economics for Engineers is taught by Prof. Mrs. Priyanka Deshpande for both A and B divisions.",
+      facultyCards: facDeshpande ? [facDeshpande] : undefined,
+      suggestedFollowUps: ['Who teaches Operating System?', 'Who teaches OOP?', 'Who is the HOD of AIDS?'],
+      intent: 'teaching_allocation_efe',
+      contextUpdates: { lastSubjectId: 'sem3-efe', lastFacultyId: facDeshpande?.id },
+    };
+  }
+
+  // I. Electives
+  if ((/e-business|retailing/i.test(lower)) && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    const facChaudhari = findFaculty('Chaudhari') || findFaculty('Sheetal');
+    return {
+      text: "E-Business and Retailing is taught and coordinated by Prof. Sheetal Chaudhari.",
+      facultyCards: facChaudhari ? [facChaudhari] : undefined,
+      suggestedFollowUps: ['Who teaches Financial Management?', 'What are my 3rd semester electives?'],
+      intent: 'teaching_allocation_ebr',
+      contextUpdates: { lastSubjectId: 'sem3-ebr', lastFacultyId: facChaudhari?.id },
+    };
+  }
+
+  if ((/financial management|finance/i.test(lower)) && (isTeacherQuery || /teacher|who/i.test(lower))) {
+    const facDeshpande = findFaculty('Deshpande') || findFaculty('Priyanka');
+    return {
+      text: "Financial Management is taught and coordinated by Prof. Mrs. Priyanka Deshpande.",
+      facultyCards: facDeshpande ? [facDeshpande] : undefined,
+      suggestedFollowUps: ['Who teaches E-Business and Retailing?', 'What are my 3rd semester electives?'],
+      intent: 'teaching_allocation_fm',
+      contextUpdates: { lastSubjectId: 'sem3-fm', lastFacultyId: facDeshpande?.id },
+    };
+  }
+
   // 4. HOD SPECIFIC QUESTIONS
   if (/who is (the )?hod|head of (the )?department|hod of aids|hod's? (name|qualification|email|details)/i.test(lower) ||
       (lower.includes('hod') && !lower.includes('faculty'))) {

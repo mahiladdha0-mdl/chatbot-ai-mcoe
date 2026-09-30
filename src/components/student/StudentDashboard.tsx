@@ -26,14 +26,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({ onNavigate, 
   const conversations = storageService.getConversations(studentId);
 
   const quickQuestions = [
+    'Who teaches OOP to A division?',
+    'Who teaches DSA?',
+    'Who teaches Operating System?',
+    'Who takes practicals?',
+    'Who is my DELD teacher?',
+    'Who takes CEP for S3 and S4 batch?',
     'What subjects do I have in Semester III?',
-    'What subjects do I have in Semester IV?',
-    'Explain Object Oriented Programming.',
-    'What is Data Structures and Algorithms?',
     'Who is the HOD of AIDS?',
-    'Show me the faculty directory.',
-    'What electives are available in Semester III?',
-    'What is Artificial Intelligence and Data Science?',
   ];
 
   return (
