@@ -1,0 +1,6 @@
+{
+  "name": "Modern College AI Assistant",
+  "description": "Intelligent academic companion for the Artificial Intelligence & Data Science (AIDS) Department at Modern College of Engineering, Pune. Explore semester subjects, syllabus, faculty directory, and academic queries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
